@@ -1,0 +1,16 @@
+---
+# defaults file for slm-monitoring
+slm_monitoring_cadvisor_install_location: /usr/local/bin/cadvisor
+slm_monitoring_cadvisor_user: root
+slm_monitoring_cadvisor_port: 8080
+slm_monitoring_cadvisor_version: latest
+
+slm_monitoring_proc_exp_install_location: /usr/local/bin/process-exporter
+slm_monitoring_proc_exp_version: latest
+slm_monitoring_proc_exp_user: root
+slm_monitoring_proc_exp_config_path: /etc/process_exporter/proc_exp.yml
+slm_monitoring_proc_exp_config: !unsafe >
+  process_names:
+    - name: "{{.Comm}}"
+      cmdline:
+      - '.+'

@@ -1,0 +1,9 @@
+[Unit]
+Description=Run process-exporter to collect process metrics
+
+[Service]
+RunAs={{slm_monitoring_proc_exp_user}}
+ExecStart={{slm_monitoring_proc_exp_install_location}} -config.path {{ slm_monitoring_proc_exp_config_path }}
+
+[Install]
+WantedBy=multi-user.target

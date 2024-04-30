@@ -1,0 +1,55 @@
+---
+# See https://docs.github.com/rest/releases/releases#get-the-latest-release
+- block:
+  - name: Determine latest GitHub release (local)
+    delegate_to: localhost
+    become: false
+    uri:
+      url: "https://api.github.com/repos/google/cadvisor/releases/latest"
+      body_format: json
+      headers:
+        X-GitHub-Api-Version: "2022-11-28"
+    register: _github_release
+    until: _github_release.status == 200
+    retries: 5
+
+  - name: Set slm_monitoring_cadvisor_version
+    set_fact:
+      slm_monitoring_cadvisor_version: "{{ _github_release.json.tag_name}}"
+  when: (slm_monitoring_cadvisor_version == 'latest')
+  run_once: true
+
+- name: Create cache directory
+  file:
+    path: /var/cache/cadvisor/{{ slm_monitoring_cadvisor_version }}
+    state: directory
+
+- name: Download cAdvisor ({{ ansible_architecture }})
+  get_url:
+    dest: /var/cache/cadvisor/{{ slm_monitoring_cadvisor_version }}/cadvisor
+    url: https://github.com/google/cadvisor/releases/download/{{ slm_monitoring_cadvisor_version }}/cadvisor-{{ slm_monitoring_cadvisor_version }}-linux-{{ slm_monitoring_go_architecture[ansible_architecture] }}
+
+- name: Copy cAdvisor binary to {{ slm_monitoring_cadvisor_install_location}}
+  copy:
+    src: /var/cache/cadvisor/{{ slm_monitoring_cadvisor_version }}/cadvisor
+    dest: "{{ slm_monitoring_cadvisor_install_location }}"
+    mode: u=rwx,g=rx,o=rx
+    remote_src: true
+
+- name: Create user for cAdvisor
+  user:
+    append: true
+    create_home: false
+    groups: docker
+    name: "{{slm_monitoring_cadvisor_user}}"
+    state: present
+    system: true
+  when: slm_monitoring_cadvisor_user != 'root'
+
+- name: Place cAdvisor service file
+  template:
+    src: cadvisor.service.j2
+    dest: /etc/systemd/system/cadvisor.service
+  notify:
+    - Reload system service configuration
+    - Restart cAdvisor service

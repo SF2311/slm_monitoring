@@ -1,0 +1,4 @@
+---
+slm_monitoring_go_architecture:
+  aarch64: arm64
+  x86_64: amd64

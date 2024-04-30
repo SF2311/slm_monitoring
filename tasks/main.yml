@@ -1,0 +1,16 @@
+---
+- name: Install cAdvisor on target host
+  ansible.builtin.include_tasks: install_cadvisor.yml
+  when: state | default("present") == "present"
+
+- name: Install process-exporter on target host
+  ansible.builtin.include_tasks: install_proc_exp.yml
+  when: state | default("present") == "present"
+
+- name: Uninstall cAdvisor on target host
+  ansible.builtin.include_tasks: uninstall_cadvisor.yml
+  when: state | default("present") == "absent"
+
+- name: Uninstall process-exporter on target host
+  ansible.builtin.include_tasks: uninstall_proc_exp.yml
+  when: state | default("present") == "absent"

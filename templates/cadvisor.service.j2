@@ -1,0 +1,9 @@
+[Unit]
+Description=Run cAdvisor to collect container metrics
+
+[Service]
+RunAs={{slm_monitoring_cadvisor_user}}
+ExecStart={{slm_monitoring_cadvisor_install_location}} --port={{slm_monitoring_cadvisor_port}}
+
+[Install]
+WantedBy=multi-user.target

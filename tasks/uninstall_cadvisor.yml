@@ -1,0 +1,22 @@
+---
+- name: Stop cAdvisor service
+  ansible.builtin.systemd_service:
+    name: cadvisor
+    state: stopped
+
+- name: Remove files
+  ansible.builtin.file:
+    path: "{{item}}"
+    state: absent
+  loop:
+    - "{{ slm_monitoring_cadvisor_install_location }}"
+    - /etc/systemd/system/cadvisor.service
+    - /var/cache/cadvisor
+  notify:
+    - Reload system service configuration
+
+- name: Remove user for cAdvisor
+  user:
+    name: "{{slm_monitoring_cadvisor_user}}"
+    state: absent
+  when: slm_monitoring_cadvisor_user != 'root'
