@@ -1,16 +1,16 @@
 ---
 - name: Reload system service configuration
-  systemd_service:
+  ansible.builtin.systemd:
     daemon_reload: true
 
 - name: Restart cAdvisor service
-  systemd_service:
+  ansible.builtin.systemd:
     name: cadvisor
     enabled: true
     state: restarted
 
 - name: Restart process-exporter service
-  systemd_service:
+  ansible.builtin.systemd:
     name: process-exporter
     enabled: true
     state: restarted
